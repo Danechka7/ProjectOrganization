@@ -1,0 +1,67 @@
+﻿<Page x:Class="ProjectOrganization.WorksPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Работы" FontFamily="Times New Roman" FontSize="14"
+      Background="White">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Поиск по ID договора:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBox Name="TBoxSearch" Width="100" TextChanged="TBoxSearch_TextChanged" PreviewTextInput="OnlyNumbers_PreviewTextInput"/>
+                <TextBlock Text="Сортировка:" VerticalAlignment="Center" Margin="15,0,5,0"/>
+                <ComboBox Name="CmbSort" Width="150" SelectionChanged="CmbSort_SelectionChanged">
+                    <ComboBoxItem Content="Без сортировки" IsSelected="True"/>
+                    <ComboBoxItem Content="По дате начала"/>
+                    <ComboBoxItem Content="По ID договора"/>
+                </ComboBox>
+            </WrapPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Name="BtnAdd" Content="+ Добавить" Width="120" Height="30" Margin="0,0,10,0" Click="BtnAdd_Click" Background="#2ECC71" Foreground="White" FontWeight="Bold"/>
+                <Button Name="BtnDelete" Content="Удалить" Width="100" Height="30" Click="BtnDelete_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
+            </StackPanel>
+        </Grid>
+
+        <ListView Name="WorkListView" Grid.Row="1" MouseDoubleClick="WorkListView_MouseDoubleClick">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Style.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="#F9F9F9"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding WorkID}" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Contracts.ContractNumber}"/>
+                            <TextBlock Grid.Column="2" Text="{Binding StartDate, StringFormat=dd.MM.yyyy}"/>
+                            <TextBlock Grid.Column="3" Text="{Binding Departments.DepartmentName}"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Employees.LastName}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Page>

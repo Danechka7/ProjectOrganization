@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F5479D23-2BAE-4808-B2BB-79206691DCBF}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>ProjectOrganization</RootNamespace>
+    <AssemblyName>ProjectOrganization</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="AmountToColorConverter.cs" />
+    <Compile Include="ContractEditWindow.xaml.cs">
+      <DependentUpon>ContractEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Contracts.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DepartmentEditWindow.xaml.cs">
+      <DependentUpon>DepartmentEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Departments.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeeEditWindow.xaml.cs">
+      <DependentUpon>EmployeeEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Employees.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeesArchive.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GetContractsByDateRange_Result.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="OrganizationEditWindow.xaml.cs">
+      <DependentUpon>OrganizationEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Organizations.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectWorks.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QuickOrgWindow.xaml.cs">
+      <DependentUpon>QuickOrgWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="sp_helpdiagramdefinition_Result.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_helpdiagrams_Result.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="View_ContractSummary.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="View_ContractWorkCount.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="View_CustomerTotalAmount.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="View_DepartmentsWithoutEmployees.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WorkEditWindow.xaml.cs">
+      <DependentUpon>WorkEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WorksPage.xaml.cs">
+      <DependentUpon>WorksPage.xaml</DependentUpon>
+    </Compile>
+    <Page Include="AuthWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContractEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContractsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DepartmentEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DepartmentsPage .xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EmployeeEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EmployeesPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AuthWindow.xaml.cs">
+      <DependentUpon>AuthWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ContractsPage.xaml.cs">
+      <DependentUpon>ContractsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DepartmentsPage .xaml.cs">
+      <DependentUpon>DepartmentsPage .xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeesPage.xaml.cs">
+      <DependentUpon>EmployeesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="KuzminModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KuzminModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="KuzminModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="KuzminModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>KuzminModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="OrganizationEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OrganizationsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="QuickOrgWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorkEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WorksPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OrganizationsPage.xaml.cs">
+      <DependentUpon>OrganizationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EntityDeploy Include="KuzminModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>KuzminModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="KuzminModel.edmx.diagram">
+      <DependentUpon>KuzminModel.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="KuzminModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>KuzminModel.Context.cs</LastGenOutput>
+      <DependentUpon>KuzminModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="KuzminModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>KuzminModel.edmx</DependentUpon>
+      <LastGenOutput>KuzminModel.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
