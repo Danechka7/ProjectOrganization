@@ -1,35 +1,22 @@
-﻿<Page x:Class="ProjectOrganization.ContractsPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:local="clr-namespace:ProjectOrganization"
-      Title="Договора" FontFamily="Times New Roman" FontSize="14"
-      Background="White">
-
+﻿<Page x:Class="ProjectOrganization.ContractsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:ProjectOrganization" Title="Договора" FontFamily="Times New Roman" FontSize="14" Background="White">
     <Page.Resources>
-        <!-- Подключаем конвертер для зеленой подсветки сумм > 2 млн -->
         <local:AmountToColorConverter x:Key="AmountColor" />
     </Page.Resources>
-
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <!-- Панель поиска, фильтров и кнопок -->
         <Grid Grid.Row="0" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-
             <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                 <TextBox Name="TBoxSearch" Width="120" TextChanged="TBoxSearch_TextChanged"/>
-
                 <TextBlock Text="Мин. сумма:" VerticalAlignment="Center" Margin="15,0,5,0"/>
                 <TextBox Name="TxtMinAmount" Width="100" TextChanged="TxtMinAmount_TextChanged" PreviewTextInput="OnlyNumbers_PreviewTextInput"/>
-
                 <TextBlock Text="Сортировка:" VerticalAlignment="Center" Margin="15,0,5,0"/>
                 <ComboBox Name="CmbSort" Width="150" SelectionChanged="CmbSort_SelectionChanged">
                     <ComboBoxItem Content="Без сортировки" IsSelected="True"/>
@@ -37,17 +24,11 @@
                     <ComboBoxItem Content="По сумме (убыв.)"/>
                 </ComboBox>
             </WrapPanel>
-
-            <!-- Кнопки: Добавить и Удалить -->
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Name="BtnAdd" Content="+ Добавить" Width="120" Height="30" Margin="0,0,10,0" 
-                        Click="BtnAdd_Click" Background="#2ECC71" Foreground="White" FontWeight="Bold"/>
-                <Button Name="BtnDelete" Content="Удалить" Width="100" Height="30" 
-                        Click="BtnDelete_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
+                <Button Name="BtnAdd" Content="+ Добавить" Width="120" Height="30" Margin="0,0,10,0" Click="BtnAdd_Click" Background="#2ECC71" Foreground="White" FontWeight="Bold"/>
+                <Button Name="BtnDelete" Content="Удалить" Width="100" Height="30" Click="BtnDelete_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
-
-        <!-- Список договоров -->
         <ListView Name="ContractListView" Grid.Row="1" MouseDoubleClick="ContractListView_MouseDoubleClick">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
@@ -60,9 +41,7 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <!-- Обязательно даем имя Border для триггеров -->
-                    <Border x:Name="RowBorder" Padding="5" CornerRadius="3" 
-                            Background="{Binding ContractAmount, Converter={StaticResource AmountColor}}">
+                    <Border x:Name="RowBorder" Padding="5" CornerRadius="3" Background="{Binding ContractAmount, Converter={StaticResource AmountColor}}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="50"/>
@@ -78,9 +57,7 @@
                             <TextBlock Grid.Column="4" Text="{Binding Organizations.OrgName}"/>
                         </Grid>
                     </Border>
-
                     <DataTemplate.Triggers>
-                        <!-- Подсветка красным, если ответственный сотрудник удален (ID = null) -->
                         <DataTrigger Binding="{Binding ResponsibleEmployeeID}" Value="{x:Null}">
                             <Setter TargetName="RowBorder" Property="Background" Value="#FFCDD2"/>
                             <Setter TargetName="RowBorder" Property="BorderBrush" Value="#E53935"/>

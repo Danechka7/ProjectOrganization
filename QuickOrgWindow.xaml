@@ -1,9 +1,4 @@
-﻿<Window x:Class="ProjectOrganization.QuickOrgWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Новая организация" Height="480" Width="400" 
-        WindowStartupLocation="CenterScreen"
-        FontFamily="Times New Roman" FontSize="14" Background="White">
+﻿<Window x:Class="ProjectOrganization.QuickOrgWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Новая организация" Height="480" Width="400" WindowStartupLocation="CenterScreen" FontFamily="Times New Roman" FontSize="14" Background="White">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,44 +11,37 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
         <TextBlock Text="Новая организация" FontSize="18" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,15" Grid.Row="0" HorizontalAlignment="Center"/>
-
         <StackPanel Grid.Row="1" Margin="0,0,0,8">
             <TextBlock Text="Название *"/>
             <TextBox Name="TxtName" Height="25"/>
         </StackPanel>
-
         <StackPanel Grid.Row="2" Margin="0,0,0,8">
-            <TextBlock Text="Тип деятельности"/>
+            <TextBlock Text="Тип деятельности *"/>
             <TextBox Name="TxtActivityType" Height="25"/>
         </StackPanel>
-
         <Grid Grid.Row="3" Margin="0,0,0,8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                <TextBlock Text="Страна"/>
+                <TextBlock Text="Страна *"/>
                 <TextBox Name="TxtCountry" Height="25"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                <TextBlock Text="Город"/>
+                <TextBlock Text="Город *"/>
                 <TextBox Name="TxtCity" Height="25"/>
             </StackPanel>
         </Grid>
-
         <StackPanel Grid.Row="4" Margin="0,0,0,8">
-            <TextBlock Text="Адрес (Улица)"/>
+            <TextBlock Text="Адрес *"/>
             <TextBox Name="TxtAddress" Height="25"/>
         </StackPanel>
-
         <StackPanel Grid.Row="5" Margin="0,0,0,20">
-            <TextBlock Text="ФИО Директора"/>
+            <TextBlock Text="ФИО Директора *"/>
             <TextBox Name="TxtDirector" Height="25"/>
         </StackPanel>
-
         <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="ОК" Width="100" Height="35" Margin="0,0,15,0" Background="#2ECC71" Foreground="White" FontWeight="Bold" Click="BtnOk_Click"/>
             <Button Content="Отмена" Width="100" Height="35" Background="#E74C3C" Foreground="White" FontWeight="Bold" Click="BtnCancel_Click"/>

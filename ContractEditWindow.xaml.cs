@@ -5,14 +5,12 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
 namespace ProjectOrganization
 {
     public partial class ContractEditWindow : Window
     {
         private Contracts _editingContract = null;
         private List<Organizations> _organizations;
-
         public ContractEditWindow()
         {
             InitializeComponent();
@@ -21,31 +19,16 @@ namespace ProjectOrganization
             LoadData();
             GenerateContractNumber();
         }
-
         public ContractEditWindow(Contracts con) : this()
         {
             _editingContract = con;
             TxtTitle.Text = "Редактирование договора";
-
             TxtNumber.Text = con.ContractNumber;
             TxtAmount.Text = con.ContractAmount.ToString();
             CmbOrganization.SelectedValue = con.OrganizationID;
             CmbEmployee.SelectedValue = con.ResponsibleEmployeeID;
-
-            if (con.ContractDate != null)
-            {
-                DpContractDate.SelectedDate = con.ContractDate;
-
-                // Блокируем изменение даты, только если прошло больше 7 дней
-                int daysPassed = (DateTime.Today - con.ContractDate.Date).Days;
-                if (daysPassed > 7)
-                {
-                    DpContractDate.IsEnabled = false;
-                    DpContractDate.ToolTip = "Дата не может быть изменена, так как договору больше 7 дней.";
-                }
-            }
+            if (con.ContractDate != null) DpContractDate.SelectedDate = con.ContractDate;
         }
-
         private void GenerateContractNumber()
         {
             if (_editingContract != null) return;
@@ -53,62 +36,45 @@ namespace ProjectOrganization
             try
             {
                 var db = new ProjectOrganizationDBEntities();
-
-                // Берем ТЕКУЩИЙ системный год
                 int currentYear = DateTime.Today.Year;
+                var lastContract = db.Contracts.OrderByDescending(x => x.ContractID).FirstOrDefault();
 
-                // Ищем договор, в номере которого есть текущий год (например, "2026")
-                // Мы ищем по строке, а не по дате, чтобы не зависеть от тестовых данных
-                string yearPattern = currentYear.ToString();
+                int nextNumber = 1;
 
-                var lastContract = db.Contracts
-                    .Where(x => x.ContractNumber.Contains(yearPattern))
-                    .OrderByDescending(x => x.ContractID)
-                    .FirstOrDefault();
-
-                string newNumber = $"Д-{currentYear}-001";
-
-                if (lastContract != null)
+                if (lastContract != null && !string.IsNullOrWhiteSpace(lastContract.ContractNumber))
                 {
                     string lastNum = lastContract.ContractNumber;
                     int lastDash = lastNum.LastIndexOf('-');
 
-                    if (lastDash > 0)
+                    if (lastDash > 0 && lastDash < lastNum.Length - 1)
                     {
-                        string prefix = lastNum.Substring(0, lastDash + 1);
                         string numberPart = lastNum.Substring(lastDash + 1);
-
                         if (int.TryParse(numberPart, out int num))
                         {
-                            newNumber = $"Д-{currentYear}-" + (num + 1).ToString("D3");
+                            nextNumber = num + 1;
                         }
                     }
                 }
-
-                TxtNumber.Text = newNumber;
+                TxtNumber.Text = $"Д-{currentYear}-{nextNumber:D3}";
             }
             catch
             {
                 TxtNumber.Text = $"Д-{DateTime.Today.Year}-001";
             }
         }
-
         private void LoadData()
         {
             var db = new ProjectOrganizationDBEntities();
-
             _organizations = db.Organizations.ToList();
             CmbOrganization.ItemsSource = _organizations;
             CmbEmployee.ItemsSource = db.Employees.ToList();
         }
-
         private void OnlyNumbers_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             var tb = (TextBox)sender;
             string pattern = (tb.Name == "TxtAmount") ? @"[0-9.,]+" : "[0-9]+";
             e.Handled = !Regex.IsMatch(e.Text, pattern);
         }
-
         private void BtnAddNewOrg_Click(object sender, RoutedEventArgs e)
         {
             var quickWindow = new QuickOrgWindow();
@@ -120,62 +86,36 @@ namespace ProjectOrganization
                 CmbOrganization.SelectedItem = quickWindow.NewOrganization;
             }
         }
-
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TxtNumber.Text) ||
-                CmbOrganization.SelectedItem == null ||
-                CmbEmployee.SelectedValue == null)
+            if (string.IsNullOrWhiteSpace(TxtNumber.Text) || string.IsNullOrWhiteSpace(TxtAmount.Text) || CmbOrganization.SelectedItem == null || CmbEmployee.SelectedValue == null || DpContractDate.SelectedDate == null)
             {
-                MessageBox.Show("Заполните обязательные поля (Номер, Организация, Сотрудник)!");
+                MessageBox.Show("Заполните все обязательные поля!");
                 return;
             }
-
-            if (DpContractDate.SelectedDate == null)
-            {
-                MessageBox.Show("Укажите дату договора!");
-                return;
-            }
-
-            // --- ПРОВЕРКА ДАТЫ ---
             DateTime selectedDate = DpContractDate.SelectedDate.Value.Date;
-            DateTime today = DateTime.Today;
-
             if (_editingContract == null)
             {
-                // Для нового договора дата должна быть строго сегодняшней
-                if (selectedDate != today)
+                if (selectedDate != DateTime.Today)
                 {
-                    MessageBox.Show("Для нового договора дата должна быть строго сегодняшней (" + today.ToString("dd.MM.yyyy") + ")!");
+                    MessageBox.Show("Для нового договора дата должна быть сегодняшней!");
                     return;
                 }
             }
-            else
+            else if (_editingContract.ContractDate != null)
             {
-                // Для редактирования проверяем, сколько прошло времени с даты старого договора
-                if (_editingContract.ContractDate != null)
+                int daysPassed = (DateTime.Today - _editingContract.ContractDate.Date).Days;
+                if (daysPassed > 7 && selectedDate != _editingContract.ContractDate.Date)
                 {
-                    DateTime oldDate = _editingContract.ContractDate.Date;
-                    int daysPassed = (today - oldDate).Days;
-
-                    // Если прошло больше 7 дней и дату пытаются изменить
-                    if (daysPassed > 7 && selectedDate != oldDate)
-                    {
-                        MessageBox.Show($"Договор был создан {oldDate.ToString("dd.MM.yyyy")} (более 7 дней назад). Изменять дату запрещено!");
-                        return;
-                    }
-
-                    // Если прошло меньше 7 дней - разрешаем менять
+                    MessageBox.Show("Договор создан более 7 дней назад. Менять дату запрещено!");
+                    return;
                 }
             }
-
             try
             {
                 var db = new ProjectOrganizationDBEntities();
-
                 var selectedOrg = (Organizations)CmbOrganization.SelectedItem;
                 Organizations orgForContract;
-
                 if (selectedOrg.OrganizationID == 0)
                 {
                     orgForContract = new Organizations
@@ -194,18 +134,17 @@ namespace ProjectOrganization
                 {
                     orgForContract = db.Organizations.FirstOrDefault(x => x.OrganizationID == selectedOrg.OrganizationID);
                 }
-
+                decimal amount = decimal.Parse(TxtAmount.Text.Replace('.', ','));
                 if (_editingContract == null)
                 {
-                    var newCon = new Contracts
+                    db.Contracts.Add(new Contracts
                     {
                         ContractNumber = TxtNumber.Text,
                         ContractDate = selectedDate,
-                        ContractAmount = string.IsNullOrWhiteSpace(TxtAmount.Text) ? 0 : decimal.Parse(TxtAmount.Text.Replace('.', ',')),
+                        ContractAmount = amount,
                         OrganizationID = orgForContract.OrganizationID,
                         ResponsibleEmployeeID = (int)CmbEmployee.SelectedValue
-                    };
-                    db.Contracts.Add(newCon);
+                    });
                 }
                 else
                 {
@@ -213,24 +152,21 @@ namespace ProjectOrganization
                     if (con != null)
                     {
                         con.ContractNumber = TxtNumber.Text;
-                        con.ContractDate = selectedDate; // Ставим ту, которую выбрал пользователь (или старую)
-                        con.ContractAmount = string.IsNullOrWhiteSpace(TxtAmount.Text) ? 0 : decimal.Parse(TxtAmount.Text.Replace('.', ','));
+                        con.ContractDate = selectedDate;
+                        con.ContractAmount = amount;
                         con.OrganizationID = orgForContract.OrganizationID;
                         con.ResponsibleEmployeeID = (int)CmbEmployee.SelectedValue;
                     }
                 }
-
                 db.SaveChanges();
                 DialogResult = true;
                 this.Close();
             }
             catch (Exception ex)
             {
-                string msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-                MessageBox.Show("Ошибка сохранения: " + msg);
+                MessageBox.Show("Ошибка: " + (ex.InnerException?.Message ?? ex.Message));
             }
         }
-
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
