@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
+
 namespace ProjectOrganization
 {
     public partial class WorkEditWindow : Window
     {
         private ProjectWorks _editingWork = null;
+
         public WorkEditWindow()
         {
             InitializeComponent();
             TxtTitle.Text = "Добавление работы";
             LoadData();
         }
+
         public WorkEditWindow(ProjectWorks work) : this()
         {
             _editingWork = work;
@@ -19,54 +22,69 @@ namespace ProjectOrganization
             CmbContract.SelectedValue = work.ContractID;
             CmbDepartment.SelectedValue = work.DepartmentID;
             CmbEmployee.SelectedValue = work.ResponsibleEmployeeID;
+            TxtDescription.Text = work.WorkDescription;
         }
+
         private void LoadData()
         {
-            var db = new ProjectOrganizationDBEntities();
-            CmbContract.ItemsSource = db.Contracts.ToList();
-            CmbDepartment.ItemsSource = db.Departments.ToList();
-            CmbEmployee.ItemsSource = db.Employees.ToList();
+            using (var db = new ProjectOrganizationDBEntities())
+            {
+                CmbContract.ItemsSource = db.Contracts.ToList();
+                CmbDepartment.ItemsSource = db.Departments.ToList();
+                CmbEmployee.ItemsSource = db.Employees.ToList();
+            }
         }
+
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (CmbContract.SelectedValue == null || CmbDepartment.SelectedValue == null || CmbEmployee.SelectedValue == null)
+            if (CmbContract.SelectedValue == null ||
+                CmbDepartment.SelectedValue == null ||
+                CmbEmployee.SelectedValue == null ||
+                string.IsNullOrWhiteSpace(TxtDescription.Text))
             {
-                MessageBox.Show("Заполните все обязательные поля!");
+                MessageBox.Show("Заполните все обязательные поля и описание работы!");
                 return;
             }
+
             try
             {
-                var db = new ProjectOrganizationDBEntities();
-                if (_editingWork == null)
+                using (var db = new ProjectOrganizationDBEntities())
                 {
-                    db.ProjectWorks.Add(new ProjectWorks
+                    if (_editingWork == null)
                     {
-                        ContractID = (int)CmbContract.SelectedValue,
-                        DepartmentID = (int)CmbDepartment.SelectedValue,
-                        ResponsibleEmployeeID = (int)CmbEmployee.SelectedValue,
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now
-                    });
-                }
-                else
-                {
-                    var work = db.ProjectWorks.FirstOrDefault(x => x.WorkID == _editingWork.WorkID);
-                    if (work != null)
-                    {
-                        work.ContractID = (int)CmbContract.SelectedValue;
-                        work.DepartmentID = (int)CmbDepartment.SelectedValue;
-                        work.ResponsibleEmployeeID = (int)CmbEmployee.SelectedValue;
+                        db.ProjectWorks.Add(new ProjectWorks
+                        {
+                            ContractID = (int)CmbContract.SelectedValue,
+                            DepartmentID = (int)CmbDepartment.SelectedValue,
+                            ResponsibleEmployeeID = (int)CmbEmployee.SelectedValue,
+                            WorkDescription = TxtDescription.Text.Trim(),
+                            StartDate = DateTime.Today,
+                            EndDate = DateTime.Today
+                        });
                     }
+                    else
+                    {
+                        var work = db.ProjectWorks.FirstOrDefault(x => x.WorkID == _editingWork.WorkID);
+                        if (work != null)
+                        {
+                            work.ContractID = (int)CmbContract.SelectedValue;
+                            work.DepartmentID = (int)CmbDepartment.SelectedValue;
+                            work.ResponsibleEmployeeID = (int)CmbEmployee.SelectedValue;
+                            work.WorkDescription = TxtDescription.Text.Trim();
+                        }
+                    }
+
+                    db.SaveChanges();
+                    DialogResult = true;
+                    this.Close();
                 }
-                db.SaveChanges();
-                DialogResult = true;
-                this.Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка: " + (ex.InnerException?.Message ?? ex.Message));
             }
         }
+
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;

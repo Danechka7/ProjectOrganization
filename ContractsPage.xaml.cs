@@ -1,14 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
 namespace ProjectOrganization
 {
     public partial class ContractsPage : Page
     {
         private string _role;
+
+        private class ContractRowView
+        {
+            public int ContractID { get; set; }
+            public string ContractNumber { get; set; }
+            public object ContractDate { get; set; }
+            public decimal ContractAmount { get; set; }
+            public int? ResponsibleEmployeeID { get; set; }
+            public string EmployeeNameDisplay { get; set; }
+            public string OrgNameDisplay { get; set; }
+            public Contracts SourceContract { get; set; }
+        }
+
         public ContractsPage(string role)
         {
             InitializeComponent();
@@ -20,38 +35,73 @@ namespace ProjectOrganization
             }
             UpdateList();
         }
+
         private void UpdateList()
         {
             if (ContractListView == null) return;
-            var db = new ProjectOrganizationDBEntities();
-            var list = db.Contracts.ToList();
-            if (!string.IsNullOrWhiteSpace(TBoxSearch.Text))
-                list = list.Where(x => x.ContractNumber.ToLower().Contains(TBoxSearch.Text.ToLower())).ToList();
-            if (decimal.TryParse(TxtMinAmount.Text, out decimal minAmount))
-                list = list.Where(x => x.ContractAmount >= minAmount).ToList();
-            if (CmbSort.SelectedIndex == 1) list = list.OrderByDescending(x => x.ContractDate).ToList();
-            if (CmbSort.SelectedIndex == 2) list = list.OrderByDescending(x => x.ContractAmount).ToList();
-            ContractListView.ItemsSource = list;
+            using (var db = new ProjectOrganizationDBEntities())
+            {
+                var orgsMap = db.Organizations.ToDictionary(o => o.OrganizationID, o => o.OrgName);
+                var empsMap = db.Employees.ToDictionary(e => e.EmployeeID, e => e.LastName);
+                var contracts = db.Contracts.ToList();
+
+                List<ContractRowView> list = contracts.Select(c =>
+                {
+                    int? empId = c.ResponsibleEmployeeID;
+                    int orgId = Convert.ToInt32(c.OrganizationID);
+                    decimal amount = Convert.ToDecimal(c.ContractAmount);
+
+                    return new ContractRowView
+                    {
+                        ContractID = c.ContractID,
+                        ContractNumber = c.ContractNumber,
+                        ContractDate = c.ContractDate,
+                        ContractAmount = amount,
+                        ResponsibleEmployeeID = empId,
+                        EmployeeNameDisplay = (empId.HasValue && empsMap.ContainsKey(empId.Value))
+                            ? empsMap[empId.Value]
+                            : "—",
+                        OrgNameDisplay = orgsMap.ContainsKey(orgId)
+                            ? orgsMap[orgId]
+                            : "—",
+                        SourceContract = c
+                    };
+                }).ToList();
+
+                if (!string.IsNullOrWhiteSpace(TBoxSearch.Text))
+                    list = list.Where(x => x.ContractNumber != null && x.ContractNumber.ToLower().Contains(TBoxSearch.Text.ToLower())).ToList();
+                if (decimal.TryParse(TxtMinAmount.Text, out decimal minAmount))
+                    list = list.Where(x => x.ContractAmount >= minAmount).ToList();
+                if (CmbSort.SelectedIndex == 1) list = list.OrderByDescending(x => x.ContractDate?.ToString()).ToList();
+                if (CmbSort.SelectedIndex == 2) list = list.OrderByDescending(x => x.ContractAmount).ToList();
+
+                ContractListView.ItemsSource = list;
+            }
         }
+
         private void TBoxSearch_TextChanged(object sender, TextChangedEventArgs e) => UpdateList();
         private void TxtMinAmount_TextChanged(object sender, TextChangedEventArgs e) => UpdateList();
         private void CmbSort_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateList();
+
         private void OnlyNumbers_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !Regex.IsMatch(e.Text, "[0-9]+");
         }
+
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
             var win = new ContractEditWindow();
             if (win.ShowDialog() == true) UpdateList();
         }
+
         private void ContractListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (ContractListView.SelectedItem == null) return;
-            var con = (Contracts)ContractListView.SelectedItem;
-            var win = new ContractEditWindow(con);
+            var row = (ContractRowView)ContractListView.SelectedItem;
+            var win = new ContractEditWindow(row.SourceContract);
             if (win.ShowDialog() == true) UpdateList();
         }
+
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             if (_role == "Employee" || _role == "Manager") return;
@@ -60,23 +110,26 @@ namespace ProjectOrganization
                 MessageBox.Show("Выберите договор!");
                 return;
             }
-            var con = (Contracts)ContractListView.SelectedItem;
+            var row = (ContractRowView)ContractListView.SelectedItem;
+            var con = row.SourceContract;
             try
             {
-                var db = new ProjectOrganizationDBEntities();
-                bool hasWorks = db.ProjectWorks.Any(x => x.ContractID == con.ContractID);
-                if (hasWorks)
+                using (var db = new ProjectOrganizationDBEntities())
                 {
-                    MessageBox.Show("Невозможно удалить! По договору есть работы.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-                if (MessageBox.Show($"Удалить договор №{con.ContractNumber}?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.No) return;
-                var conToDelete = db.Contracts.FirstOrDefault(x => x.ContractID == con.ContractID);
-                if (conToDelete != null)
-                {
-                    db.Contracts.Remove(conToDelete);
-                    db.SaveChanges();
-                    UpdateList();
+                    bool hasWorks = db.ProjectWorks.Any(x => x.ContractID == con.ContractID);
+                    if (hasWorks)
+                    {
+                        MessageBox.Show("Невозможно удалить! По договору есть работы.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    if (MessageBox.Show($"Удалить договор №{con.ContractNumber}?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.No) return;
+                    var conToDelete = db.Contracts.FirstOrDefault(x => x.ContractID == con.ContractID);
+                    if (conToDelete != null)
+                    {
+                        db.Contracts.Remove(conToDelete);
+                        db.SaveChanges();
+                        UpdateList();
+                    }
                 }
             }
             catch (Exception ex)

@@ -40,6 +40,8 @@
           <Property Name="Address" Type="nvarchar" MaxLength="200" />
           <Property Name="BirthDate" Type="date" Nullable="false" />
           <Property Name="Age" Type="int" StoreGeneratedPattern="Computed" />
+          <Property Name="Login" Type="nvarchar" MaxLength="100" />
+          <Property Name="Password" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <!--Ошибки, обнаруженные при создании:
 предупреждение 6002: В таблице или представлении "ProjectOrganizationDB.dbo.EmployeesArchive" не определен первичный ключ. Ключ был выведен, а определение таблицы или представления было создано в режиме только для чтения.-->
@@ -84,6 +86,17 @@
           <Property Name="ContractID" Type="int" />
           <Property Name="DepartmentID" Type="int" />
           <Property Name="ResponsibleEmployeeID" Type="int" />
+          <Property Name="WorkDescription" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
         </EntityType>
         <!--Ошибки, обнаруженные при создании:
 предупреждение 6002: В таблице или представлении "ProjectOrganizationDB.dbo.View_ContractSummary" не определен первичный ключ. Ключ был выведен, а определение таблицы или представления было создано в режиме только для чтения.-->
@@ -285,6 +298,7 @@
           <EntitySet Name="Employees" EntityType="Self.Employees" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Organizations" EntityType="Self.Organizations" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProjectWorks" EntityType="Self.ProjectWorks" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EmployeesArchive" EntityType="Self.EmployeesArchive" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
 [EmployeesArchive].[EmployeeID] AS [EmployeeID], 
@@ -415,6 +429,8 @@ FROM [dbo].[View_DepartmentsWithoutEmployees] AS [View_DepartmentsWithoutEmploye
           <NavigationProperty Name="Departments" Relationship="Self.FK_Departments_Employees" FromRole="Employees" ToRole="Departments" />
           <NavigationProperty Name="Departments1" Relationship="Self.FK_Employees_Departments" FromRole="Employees" ToRole="Departments" />
           <NavigationProperty Name="ProjectWorks" Relationship="Self.FK_ProjectWorks_Employees" FromRole="Employees" ToRole="ProjectWorks" />
+          <Property Name="Login" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Organizations">
           <Key>
@@ -442,6 +458,7 @@ FROM [dbo].[View_DepartmentsWithoutEmployees] AS [View_DepartmentsWithoutEmploye
           <NavigationProperty Name="Contracts" Relationship="Self.FK_ProjectWorks_Contracts" FromRole="ProjectWorks" ToRole="Contracts" />
           <NavigationProperty Name="Departments" Relationship="Self.FK_ProjectWorks_Departments" FromRole="ProjectWorks" ToRole="Departments" />
           <NavigationProperty Name="Employees" Relationship="Self.FK_ProjectWorks_Employees" FromRole="ProjectWorks" ToRole="Employees" />
+          <Property Name="WorkDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="EmployeesArchive">
           <Key>
@@ -619,6 +636,7 @@ FROM [dbo].[View_DepartmentsWithoutEmployees] AS [View_DepartmentsWithoutEmploye
             <Parameter Name="new_diagramname" Mode="In" Type="String" />
           </FunctionImport>
           <FunctionImport Name="sp_upgraddiagrams" />
+          <EntitySet Name="sysdiagrams" EntityType="ProjectOrganizationDBModel.sysdiagrams" />
         </EntityContainer>
         <EntityType Name="View_ContractSummary">
           <Key>
@@ -688,6 +706,16 @@ FROM [dbo].[View_DepartmentsWithoutEmployees] AS [View_DepartmentsWithoutEmploye
           <Property Type="String" Name="Owner" Nullable="true" MaxLength="128" />
           <Property Type="Int32" Name="OwnerID" Nullable="false" />
         </ComplexType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -720,6 +748,8 @@ FROM [dbo].[View_DepartmentsWithoutEmployees] AS [View_DepartmentsWithoutEmploye
           <EntitySetMapping Name="Employees">
             <EntityTypeMapping TypeName="ProjectOrganizationDBModel.Employees">
               <MappingFragment StoreEntitySet="Employees">
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Login" ColumnName="Login" />
                 <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
                 <ScalarProperty Name="LastName" ColumnName="LastName" />
                 <ScalarProperty Name="FirstName" ColumnName="FirstName" />
@@ -749,6 +779,7 @@ FROM [dbo].[View_DepartmentsWithoutEmployees] AS [View_DepartmentsWithoutEmploye
           <EntitySetMapping Name="ProjectWorks">
             <EntityTypeMapping TypeName="ProjectOrganizationDBModel.ProjectWorks">
               <MappingFragment StoreEntitySet="ProjectWorks">
+                <ScalarProperty Name="WorkDescription" ColumnName="WorkDescription" />
                 <ScalarProperty Name="WorkID" ColumnName="WorkID" />
                 <ScalarProperty Name="StartDate" ColumnName="StartDate" />
                 <ScalarProperty Name="EndDate" ColumnName="EndDate" />
@@ -854,6 +885,17 @@ FROM [dbo].[View_DepartmentsWithoutEmployees] AS [View_DepartmentsWithoutEmploye
           </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="sp_renamediagram" FunctionName="Хранилище ProjectOrganizationDBModel.sp_renamediagram" />
           <FunctionImportMapping FunctionImportName="sp_upgraddiagrams" FunctionName="Хранилище ProjectOrganizationDBModel.sp_upgraddiagrams" />
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="ProjectOrganizationDBModel.sysdiagrams">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="definition" ColumnName="definition" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

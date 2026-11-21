@@ -20,6 +20,7 @@ namespace ProjectOrganization
         public Nullable<int> ContractID { get; set; }
         public Nullable<int> DepartmentID { get; set; }
         public Nullable<int> ResponsibleEmployeeID { get; set; }
+        public string WorkDescription { get; set; }
     
         public virtual Contracts Contracts { get; set; }
         public virtual Departments Departments { get; set; }

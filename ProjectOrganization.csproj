@@ -105,6 +105,9 @@
     <Compile Include="sp_helpdiagrams_Result.cs">
       <DependentUpon>KuzminModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="sysdiagrams.cs">
+      <DependentUpon>KuzminModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="View_ContractSummary.cs">
       <DependentUpon>KuzminModel.tt</DependentUpon>
     </Compile>

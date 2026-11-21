@@ -2,9 +2,16 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Margin="0,0,0,10">
+
+        <Border Grid.Row="0" Background="#F4F6F9" BorderBrush="#D0D7DE" BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,0,0,10">
+            <TextBlock Text="Подразделения и отделы организации" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -24,9 +31,29 @@
                 <Button Name="BtnDelete" Content="Удалить" Width="100" Height="30" Click="BtnDelete_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
-        <ListView Name="DepartmentListView" Grid.Row="1" MouseDoubleClick="DepartmentListView_MouseDoubleClick">
+
+        <Border Grid.Row="2" Background="#E9ECEF" BorderBrush="#CED4DA" BorderThickness="1" Padding="6,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="55"/>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="95"/>
+                    <ColumnDefinition Width="135"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="ID" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="1" Text="Название отдела" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="2" Text="Этаж" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="3" Text="Телефон" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="4" Text="Руководитель" FontWeight="Bold" Margin="3,0"/>
+            </Grid>
+        </Border>
+
+        <ListView Name="DepartmentListView" Grid.Row="3" MouseDoubleClick="DepartmentListView_MouseDoubleClick" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Padding" Value="2"/>
                     <Style.Triggers>
                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="#F9F9F9"/>
@@ -36,20 +63,20 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Padding="5">
-                        <Grid>
+                    <Border Padding="4,5" BorderBrush="#EFEFEF" BorderThickness="0,0,0,1">
+                        <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="55"/>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="95"/>
+                                <ColumnDefinition Width="135"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding DepartmentID}" FontWeight="Bold"/>
-                            <TextBlock Grid.Column="1" Text="{Binding DepartmentName}"/>
-                            <TextBlock Grid.Column="2" Text="{Binding Floor}"/>
-                            <TextBlock Grid.Column="3" Text="{Binding Phone}"/>
-                            <TextBlock Grid.Column="4" Text="{Binding Employees.LastName}"/>
+                            <TextBlock Grid.Column="0" Text="{Binding DepartmentID}" FontWeight="Bold" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding DepartmentName}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Floor}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{Binding Phone}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Text="{Binding HeadNameDisplay}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
                         </Grid>
                     </Border>
                 </DataTemplate>

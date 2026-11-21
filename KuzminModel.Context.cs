@@ -38,6 +38,7 @@ namespace ProjectOrganization
         public DbSet<View_ContractWorkCount> View_ContractWorkCount { get; set; }
         public DbSet<View_CustomerTotalAmount> View_CustomerTotalAmount { get; set; }
         public DbSet<View_DepartmentsWithoutEmployees> View_DepartmentsWithoutEmployees { get; set; }
+        public DbSet<sysdiagrams> sysdiagrams { get; set; }
     
         [EdmFunction("ProjectOrganizationDBEntities", "GetContractsByDateRange")]
         public virtual IQueryable<GetContractsByDateRange_Result> GetContractsByDateRange(Nullable<System.DateTime> startDate, Nullable<System.DateTime> endDate)

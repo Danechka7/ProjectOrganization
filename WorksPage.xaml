@@ -2,9 +2,16 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Margin="0,0,0,10">
+
+        <Border Grid.Row="0" Background="#F4F6F9" BorderBrush="#D0D7DE" BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,0,0,10">
+            <TextBlock Text="Проектные работы и задачи по отделам" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -24,9 +31,31 @@
                 <Button Name="BtnDelete" Content="Удалить" Width="100" Height="30" Click="BtnDelete_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
-        <ListView Name="WorkListView" Grid.Row="1" MouseDoubleClick="WorkListView_MouseDoubleClick">
+
+        <Border Grid.Row="2" Background="#E9ECEF" BorderBrush="#CED4DA" BorderThickness="1" Padding="6,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="125"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="135"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="ID" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="1" Text="№ договора" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="2" Text="Дата начала" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="3" Text="Отдел" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="4" Text="Ответственный" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="5" Text="Описание работы" FontWeight="Bold" Margin="3,0"/>
+            </Grid>
+        </Border>
+
+        <ListView Name="WorkListView" Grid.Row="3" MouseDoubleClick="WorkListView_MouseDoubleClick" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Padding" Value="2"/>
                     <Style.Triggers>
                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="#F9F9F9"/>
@@ -36,20 +65,22 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Padding="5">
-                        <Grid>
+                    <Border Padding="4,5" BorderBrush="#EFEFEF" BorderThickness="0,0,0,1">
+                        <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="135"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding WorkID}" FontWeight="Bold"/>
-                            <TextBlock Grid.Column="1" Text="{Binding Contracts.ContractNumber}"/>
-                            <TextBlock Grid.Column="2" Text="{Binding StartDate, StringFormat=dd.MM.yyyy}"/>
-                            <TextBlock Grid.Column="3" Text="{Binding Departments.DepartmentName}"/>
-                            <TextBlock Grid.Column="4" Text="{Binding Employees.LastName}"/>
+                            <TextBlock Grid.Column="0" Text="{Binding WorkID}" FontWeight="Bold" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding ContractNumberDisplay}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{Binding StartDate, StringFormat=dd.MM.yyyy}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{Binding DepartmentNameDisplay}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="4" Text="{Binding EmployeeNameDisplay}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="5" Text="{Binding WorkDescription}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
                         </Grid>
                     </Border>
                 </DataTemplate>

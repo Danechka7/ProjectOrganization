@@ -14,6 +14,15 @@
             <TextBlock Name="TxtUserInfo" Foreground="White" FontSize="12" TextAlignment="Center" Margin="10,30,10,5" TextWrapping="Wrap"/>
             <Button Content="Выход" Height="40" Margin="10,5,10,20" Background="#E74C3C" Click="BtnExit_Click"/>
         </StackPanel>
-        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden" Background="White" Margin="10" BorderBrush="#DDD" BorderThickness="1"/>
+        <Grid Grid.Column="1" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="#EBF1F6" BorderBrush="#C8D3DC" BorderThickness="1" CornerRadius="4" Padding="12,8" Margin="0,0,0,8">
+                <TextBlock Text="Система управления проектной организацией" FontSize="18" FontWeight="Bold" Foreground="#1F2D3D"/>
+            </Border>
+            <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden" Background="White" BorderBrush="#DDD" BorderThickness="1"/>
+        </Grid>
     </Grid>
 </Window>

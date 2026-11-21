@@ -2,9 +2,18 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Margin="0,0,0,10">
+
+        <!-- Шапка страницы -->
+        <Border Grid.Row="0" Background="#F4F6F9" BorderBrush="#D0D7DE" BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,0,0,10">
+            <TextBlock Text="Организации-заказчики" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
+        </Border>
+
+        <!-- Панель поиска, фильтра и кнопок -->
+        <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -20,9 +29,31 @@
                 <Button Name="BtnDelete" Content="Удалить" Width="100" Height="30" Click="BtnDelete_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
-        <ListView Name="OrganizationListView" Grid.Row="1" MouseDoubleClick="OrganizationListView_MouseDoubleClick">
+
+        <!-- Шапка таблицы -->
+        <Border Grid.Row="2" Background="#E9ECEF" BorderBrush="#CED4DA" BorderThickness="1" Padding="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="ID" FontWeight="Bold"/>
+                <TextBlock Grid.Column="1" Text="Название организации" FontWeight="Bold"/>
+                <TextBlock Grid.Column="2" Text="Вид деятельности" FontWeight="Bold"/>
+                <TextBlock Grid.Column="3" Text="Город" FontWeight="Bold"/>
+                <TextBlock Grid.Column="4" Text="Руководитель" FontWeight="Bold"/>
+                <TextBlock Grid.Column="5" Text="Адрес" FontWeight="Bold"/>
+            </Grid>
+        </Border>
+
+        <ListView Name="OrganizationListView" Grid.Row="3" MouseDoubleClick="OrganizationListView_MouseDoubleClick" HorizontalContentAlignment="Stretch">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                     <Style.Triggers>
                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="#F9F9F9"/>
@@ -32,7 +63,7 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Padding="5">
+                    <Border Padding="5" BorderBrush="#EFEFEF" BorderThickness="0,0,0,1">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="50"/>
@@ -42,12 +73,12 @@
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding OrganizationID}" FontWeight="Bold"/>
-                            <TextBlock Grid.Column="1" Text="{Binding OrgName}"/>
-                            <TextBlock Grid.Column="2" Text="{Binding ActivityType}"/>
-                            <TextBlock Grid.Column="3" Text="{Binding City}"/>
-                            <TextBlock Grid.Column="4" Text="{Binding DirectorName}"/>
-                            <TextBlock Grid.Column="5" Text="{Binding Address}"/>
+                            <TextBlock Grid.Column="0" Text="{Binding OrganizationID}" FontWeight="Bold" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="1" Text="{Binding OrgName}" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="2" Text="{Binding ActivityType}" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="3" Text="{Binding City}" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="4" Text="{Binding DirectorName}" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Column="5" Text="{Binding Address}" TextWrapping="Wrap" VerticalAlignment="Top"/>
                         </Grid>
                     </Border>
                 </DataTemplate>

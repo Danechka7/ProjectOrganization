@@ -31,6 +31,8 @@ namespace ProjectOrganization
         public string Address { get; set; }
         public System.DateTime BirthDate { get; set; }
         public Nullable<int> Age { get; set; }
+        public string Login { get; set; }
+        public string Password { get; set; }
     
         public virtual ICollection<Contracts> Contracts { get; set; }
         public virtual ICollection<Departments> Departments { get; set; }

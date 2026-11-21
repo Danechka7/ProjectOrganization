@@ -5,9 +5,16 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Margin="0,0,0,10">
+
+        <Border Grid.Row="0" Background="#F4F6F9" BorderBrush="#D0D7DE" BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,0,0,10">
+            <TextBlock Text="Реестр договоров с организациями" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -29,9 +36,31 @@
                 <Button Name="BtnDelete" Content="Удалить" Width="100" Height="30" Click="BtnDelete_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
-        <ListView Name="ContractListView" Grid.Row="1" MouseDoubleClick="ContractListView_MouseDoubleClick">
+
+        <Border Grid.Row="2" Background="#E9ECEF" BorderBrush="#CED4DA" BorderThickness="1" Padding="6,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="55"/>
+                    <ColumnDefinition Width="135"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="ID" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="1" Text="Номер договора" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="2" Text="Дата" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="3" Text="Сумма" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="4" Text="Ответственный" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="5" Text="Организация" FontWeight="Bold" Margin="3,0"/>
+            </Grid>
+        </Border>
+
+        <ListView Name="ContractListView" Grid.Row="3" MouseDoubleClick="ContractListView_MouseDoubleClick" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Padding" Value="2"/>
                     <Style.Triggers>
                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="#F9F9F9"/>
@@ -41,20 +70,22 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border x:Name="RowBorder" Padding="5" CornerRadius="3" Background="{Binding ContractAmount, Converter={StaticResource AmountColor}}">
-                        <Grid>
+                    <Border x:Name="RowBorder" Padding="4,5" CornerRadius="3" Background="{Binding ContractAmount, Converter={StaticResource AmountColor}}">
+                        <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="55"/>
+                                <ColumnDefinition Width="135"/>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="140"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding ContractID}" FontWeight="Bold"/>
-                            <TextBlock Grid.Column="1" Text="{Binding ContractNumber}"/>
-                            <TextBlock Grid.Column="2" Text="{Binding ContractDate, StringFormat=dd.MM.yyyy}"/>
-                            <TextBlock Grid.Column="3" Text="{Binding ContractAmount}"/>
-                            <TextBlock Grid.Column="4" Text="{Binding Organizations.OrgName}"/>
+                            <TextBlock Grid.Column="0" Text="{Binding ContractID}" FontWeight="Bold" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding ContractNumber}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{Binding ContractDate, StringFormat=dd.MM.yyyy}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{Binding ContractAmount}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Text="{Binding EmployeeNameDisplay}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="5" Text="{Binding OrgNameDisplay}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
                         </Grid>
                     </Border>
                     <DataTemplate.Triggers>

@@ -2,9 +2,16 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Margin="0,0,0,10">
+
+        <Border Grid.Row="0" Background="#F4F6F9" BorderBrush="#D0D7DE" BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,0,0,10">
+            <TextBlock Text="Сотрудники организации" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -13,7 +20,7 @@
                 <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                 <TextBox Name="TBoxSearch" Width="120" TextChanged="TBoxSearch_TextChanged"/>
                 <TextBlock Text="Отдел:" VerticalAlignment="Center" Margin="10,0,5,0"/>
-                <ComboBox Name="CmbFilterDept" Width="120" DisplayMemberPath="DepartmentName" SelectedValuePath="DepartmentID" SelectionChanged="CmbFilterDept_SelectionChanged"/>
+                <ComboBox Name="CmbFilterDept" Width="140" DisplayMemberPath="DepartmentName" SelectedValuePath="DepartmentID" SelectionChanged="CmbFilterDept_SelectionChanged"/>
                 <TextBlock Text="Сортировка:" VerticalAlignment="Center" Margin="10,0,5,0"/>
                 <ComboBox Name="CmbSort" Width="150" SelectionChanged="CmbSort_SelectionChanged">
                     <ComboBoxItem Content="Без сортировки" IsSelected="True"/>
@@ -27,9 +34,39 @@
                 <Button Name="BtnDelete" Content="Удалить" Width="100" Height="30" Click="BtnDelete_Click" Background="#E74C3C" Foreground="White" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
-        <ListView Name="EmployeeListView" Grid.Row="1" MouseDoubleClick="EmployeeListView_MouseDoubleClick">
+
+        <Border Grid.Row="2" Background="#E9ECEF" BorderBrush="#CED4DA" BorderThickness="1" Padding="6,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="115"/>
+                    <ColumnDefinition Width="95"/>
+                    <ColumnDefinition Width="115"/>
+                    <ColumnDefinition Width="125"/>
+                    <ColumnDefinition Width="145"/>
+                    <ColumnDefinition x:Name="LoginHeaderCol" Width="95"/>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="55"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="ID" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="1" Text="Фамилия" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="2" Text="Имя" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="3" Text="Отчество" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="4" Text="Должность" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="5" Text="Отдел" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock x:Name="TxtLoginHeader" Grid.Column="6" Text="Логин" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="7" Text="Пол" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="8" Text="Возраст" FontWeight="Bold" Margin="3,0"/>
+                <TextBlock Grid.Column="9" Text="Адрес" FontWeight="Bold" Margin="3,0"/>
+            </Grid>
+        </Border>
+
+        <ListView Name="EmployeeListView" Grid.Row="3" MouseDoubleClick="EmployeeListView_MouseDoubleClick" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Padding" Value="2"/>
                     <Style.Triggers>
                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="#F9F9F9"/>
@@ -39,28 +76,30 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border x:Name="RowBorder" Padding="5" CornerRadius="3">
-                        <Grid>
+                    <Border x:Name="RowBorder" Padding="4,5" CornerRadius="3" BorderBrush="#EFEFEF" BorderThickness="0,0,0,1">
+                        <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="45"/>
+                                <ColumnDefinition Width="115"/>
+                                <ColumnDefinition Width="95"/>
+                                <ColumnDefinition Width="115"/>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="145"/>
+                                <ColumnDefinition Width="{Binding ElementName=LoginHeaderCol, Path=Width}"/>
+                                <ColumnDefinition Width="45"/>
+                                <ColumnDefinition Width="55"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding EmployeeID}" FontWeight="Bold"/>
-                            <TextBlock Grid.Column="1" Text="{Binding LastName}"/>
-                            <TextBlock Grid.Column="2" Text="{Binding FirstName}"/>
-                            <TextBlock Grid.Column="3" Text="{Binding Patronymic}"/>
-                            <TextBlock Grid.Column="4" Text="{Binding Position}"/>
-                            <TextBlock Grid.Column="5" Text="{Binding Departments.DepartmentName}"/>
-                            <TextBlock Grid.Column="6" Text="{Binding Gender}"/>
-                            <TextBlock Grid.Column="7" Text="{Binding Age}"/>
-                            <TextBlock Grid.Column="8" Text="{Binding Address}"/>
+                            <TextBlock Grid.Column="0" Text="{Binding EmployeeID}" FontWeight="Bold" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding LastName}" Margin="3,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="2" Text="{Binding FirstName}" Margin="3,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="3" Text="{Binding Patronymic}" Margin="3,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Position}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="5" Text="{Binding DepartmentNameDisplay}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="6" Text="{Binding Login}" Margin="3,0" VerticalAlignment="Center" Visibility="{Binding ElementName=TxtLoginHeader, Path=Visibility}"/>
+                            <TextBlock Grid.Column="7" Text="{Binding Gender}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="8" Text="{Binding Age}" Margin="3,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="9" Text="{Binding Address}" Margin="3,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
                         </Grid>
                     </Border>
                     <DataTemplate.Triggers>
