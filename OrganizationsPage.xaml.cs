@@ -14,15 +14,14 @@ namespace ProjectOrganization
         {
             InitializeComponent();
             _role = role;
-            if (_role == "Employee")
+
+            // Manager: полный доступ. Employee: только просмотр.
+            if (_role != "Manager")
             {
                 BtnAdd.Visibility = Visibility.Collapsed;
                 BtnDelete.Visibility = Visibility.Collapsed;
             }
-            else if (_role == "Manager")
-            {
-                BtnDelete.Visibility = Visibility.Collapsed;
-            }
+
             LoadCities();
             UpdateList();
         }
@@ -41,13 +40,18 @@ namespace ProjectOrganization
         private void UpdateList()
         {
             if (OrganizationListView == null) return;
+
             using (var db = new ProjectOrganizationDBEntities())
             {
                 var list = db.Organizations.ToList();
+
                 if (!string.IsNullOrWhiteSpace(TBoxSearch.Text))
-                    list = list.Where(x => x.OrgName != null && x.OrgName.ToLower().Contains(TBoxSearch.Text.ToLower())).ToList();
+                    list = list.Where(x => x.OrgName != null &&
+                                           x.OrgName.ToLower().Contains(TBoxSearch.Text.ToLower())).ToList();
+
                 if (CmbFilterCity.SelectedIndex > 0 && CmbFilterCity.SelectedItem != null)
                     list = list.Where(x => x.City == CmbFilterCity.SelectedItem.ToString()).ToList();
+
                 OrganizationListView.ItemsSource = list;
             }
         }
@@ -57,7 +61,12 @@ namespace ProjectOrganization
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            if (_role == "Employee") return;
+            if (_role != "Manager")
+            {
+                MessageBox.Show("Добавление организаций доступно только менеджеру.",
+                    "Доступ запрещён", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var win = new OrganizationEditWindow();
             if (win.ShowDialog() == true)
             {
@@ -68,7 +77,7 @@ namespace ProjectOrganization
 
         private void OrganizationListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (_role == "Employee" || OrganizationListView.SelectedItem == null) return;
+            if (_role != "Manager" || OrganizationListView.SelectedItem == null) return;
             var org = (Organizations)OrganizationListView.SelectedItem;
             var win = new OrganizationEditWindow(org);
             if (win.ShowDialog() == true)
@@ -80,13 +89,26 @@ namespace ProjectOrganization
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (_role == "Employee" || _role == "Manager") return;
-            if (OrganizationListView.SelectedItem == null)
+            if (_role != "Manager")
             {
-                MessageBox.Show("Выберите организацию!");
+                MessageBox.Show("Удаление организаций доступно только менеджеру.",
+                    "Доступ запрещён", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            if (OrganizationListView.SelectedItem == null)
+            {
+                MessageBox.Show("Сначала выберите организацию в списке (кликните по строке).",
+                    "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var org = (Organizations)OrganizationListView.SelectedItem;
+
+            if (MessageBox.Show($"Удалить организацию «{org.OrgName}»?\n\nДействие необратимо.",
+                "Подтверждение удаления",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+
             try
             {
                 using (var db = new ProjectOrganizationDBEntities())
@@ -94,23 +116,33 @@ namespace ProjectOrganization
                     bool hasContracts = db.Contracts.Any(x => x.OrganizationID == org.OrganizationID);
                     if (hasContracts)
                     {
-                        MessageBox.Show("Невозможно удалить! С организацией заключены договоры.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Невозможно удалить! С организацией заключены договоры.",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
-                    if (MessageBox.Show($"Удалить организацию {org.OrgName}?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.No) return;
+
                     var orgToDelete = db.Organizations.FirstOrDefault(x => x.OrganizationID == org.OrganizationID);
-                    if (orgToDelete != null)
+                    if (orgToDelete == null)
                     {
-                        db.Organizations.Remove(orgToDelete);
-                        db.SaveChanges();
-                        LoadCities();
+                        MessageBox.Show("Организация не найдена в базе.",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                         UpdateList();
+                        return;
                     }
+
+                    db.Organizations.Remove(orgToDelete);
+                    db.SaveChanges();
                 }
+
+                MessageBox.Show("Организация удалена.", "Готово",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                LoadCities();
+                UpdateList();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка: " + ex.Message);
+                MessageBox.Show("Ошибка удаления: " + (ex.InnerException?.Message ?? ex.Message),
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

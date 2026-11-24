@@ -11,6 +11,13 @@ namespace ProjectOrganization
     {
         private Employees _editingEmployee = null;
 
+        // >>> ИЗМЕНЕНИЕ: добавлены точка, запятая, дефис <<<
+        private static readonly Regex AddressRegex =
+            new Regex(@"^[\p{L}\p{N}\s\.,\-]+$", RegexOptions.Compiled);
+
+        private static readonly Regex HouseRegex =
+            new Regex(@"^[\p{L}\p{N}\s/]+$", RegexOptions.Compiled);
+
         public EmployeeEditWindow()
         {
             InitializeComponent();
@@ -60,9 +67,35 @@ namespace ProjectOrganization
             }
         }
 
-        private void OnlyNumbers_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void Address_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = !Regex.IsMatch(e.Text, "[0-9]+");
+            e.Handled = !AddressRegex.IsMatch(e.Text);
+        }
+
+        private void House_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !HouseRegex.IsMatch(e.Text);
+        }
+
+        // >>> ИЗМЕНЕНИЕ: защита от вставки из буфера <<<
+        private void Address_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                string text = (string)e.DataObject.GetData(typeof(string));
+                if (!AddressRegex.IsMatch(text)) e.CancelCommand();
+            }
+            else e.CancelCommand();
+        }
+
+        private void House_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                string text = (string)e.DataObject.GetData(typeof(string));
+                if (!HouseRegex.IsMatch(text)) e.CancelCommand();
+            }
+            else e.CancelCommand();
         }
 
         private void DpBirthDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
@@ -82,21 +115,38 @@ namespace ProjectOrganization
         {
             string login = TxtLogin.Text.Trim();
             string password = TxtPassword.Text.Trim();
+            string street = TxtStreet.Text.Trim();
+            string house = TxtHouse.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(TxtLastName.Text) ||
                 string.IsNullOrWhiteSpace(TxtFirstName.Text) ||
                 string.IsNullOrWhiteSpace(CmbPosition.Text) ||
                 string.IsNullOrWhiteSpace(CmbGender.Text) ||
+                string.IsNullOrWhiteSpace(street) ||
+                string.IsNullOrWhiteSpace(house) ||
                 DpBirthDate.SelectedDate == null ||
                 string.IsNullOrEmpty(login) ||
                 string.IsNullOrEmpty(password))
             {
-                MessageBox.Show("Заполните обязательные поля (включая логин и пароль)!");
+                MessageBox.Show("Заполните все обязательные поля (включая адрес, дом, логин и пароль)!");
                 return;
             }
 
-            string fullAddress = $"{TxtStreet.Text.Trim()} {TxtHouse.Text.Trim()}".Trim();
-            if (fullAddress == "") fullAddress = null;
+            if (!AddressRegex.IsMatch(street))
+            {
+                MessageBox.Show("В поле «Улица» допускаются только буквы, цифры, пробел, точка, запятая и дефис!");
+                TxtStreet.Focus();
+                return;
+            }
+
+            if (!HouseRegex.IsMatch(house))
+            {
+                MessageBox.Show("В поле «Дом» допускаются только буквы, цифры, пробел и символ «/»!");
+                TxtHouse.Focus();
+                return;
+            }
+
+            string fullAddress = $"{street} {house}";
 
             try
             {

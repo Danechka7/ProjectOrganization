@@ -49,7 +49,11 @@ namespace ProjectOrganization
                         else if (pos.Contains("начальник") || pos.Contains("руковод") || pos.Contains("менедж")) role = "Manager";
                     }
 
-                    new MainWindow(role).Show();
+                    // >>> ИЗМЕНЕНИЕ: передаём ФИО <<<
+                    string fio = $"{emp.LastName} {emp.FirstName} {emp.Patronymic}".Trim();
+                    if (string.IsNullOrWhiteSpace(fio)) fio = emp.Login;
+
+                    new MainWindow(role, fio).Show();
                     this.Close();
                 }
             }

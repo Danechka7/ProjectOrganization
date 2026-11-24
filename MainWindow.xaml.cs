@@ -1,20 +1,56 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 
 namespace ProjectOrganization
 {
     public partial class MainWindow : Window
     {
         private string _role;
+        private string _employeeName;
 
-        public MainWindow(string role)
+        public MainWindow(string role, string employeeName = "")
         {
             InitializeComponent();
-            _role = role;
-            string loginName = "Гость";
-            if (role == "Admin") loginName = "Администратор";
-            else if (role == "Manager") loginName = "Менеджер";
-            else if (role == "Employee") loginName = "Сотрудник";
-            TxtUserInfo.Text = $"Вы вошли как:\n{loginName}";
+            _role = NormalizeRole(role);   // >>> ИЗМЕНЕНИЕ
+            _employeeName = employeeName;
+
+            string displayName = !string.IsNullOrWhiteSpace(_employeeName)
+                ? _employeeName.Trim()
+                : GetRoleFallbackName(_role);
+
+            TxtUserInfo.Text = $"Вы вошли как:\n{displayName}";
+
+            if (_role == "Admin")
+            {
+                UserInfoBorder.Background = Brushes.Yellow;
+                TxtUserInfo.Foreground = Brushes.Black;
+            }
+            else
+            {
+                UserInfoBorder.Background = Brushes.Transparent;
+                TxtUserInfo.Foreground = Brushes.White;
+            }
+        }
+
+        // >>> ИЗМЕНЕНИЕ: защита от регистра <<<
+        private string NormalizeRole(string role)
+        {
+            if (string.IsNullOrWhiteSpace(role)) return "Employee";
+            switch (role.Trim().ToLower())
+            {
+                case "admin": return "Admin";
+                case "manager": return "Manager";
+                case "employee": return "Employee";
+                default: return "Employee";
+            }
+        }
+
+        private string GetRoleFallbackName(string role)
+        {
+            if (role == "Admin") return "Администратор";
+            if (role == "Manager") return "Менеджер";
+            if (role == "Employee") return "Сотрудник";
+            return "Гость";
         }
 
         private void BtnEmployees_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new EmployeesPage(_role));

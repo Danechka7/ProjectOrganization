@@ -11,7 +11,9 @@
             <Button Content="Организации" Height="40" Margin="10,5" Click="BtnOrganizations_Click"/>
             <Button Content="Договора" Height="40" Margin="10,5" Click="BtnContracts_Click"/>
             <Button Content="Работы" Height="40" Margin="10,5" Click="BtnWorks_Click"/>
-            <TextBlock Name="TxtUserInfo" Foreground="White" FontSize="12" TextAlignment="Center" Margin="10,30,10,5" TextWrapping="Wrap"/>
+            <Border Name="UserInfoBorder" CornerRadius="4" Padding="6,4" Margin="10,30,10,5" Background="Transparent">
+                <TextBlock Name="TxtUserInfo" Foreground="White" FontSize="12" TextAlignment="Center" TextWrapping="Wrap"/>
+            </Border>
             <Button Content="Выход" Height="40" Margin="10,5,10,20" Background="#E74C3C" Click="BtnExit_Click"/>
         </StackPanel>
         <Grid Grid.Column="1" Margin="10">

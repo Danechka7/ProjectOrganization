@@ -28,21 +28,21 @@ namespace ProjectOrganization
         {
             InitializeComponent();
             _role = role;
-            if (_role == "Employee")
+
+            // Manager: полный доступ. Employee: только просмотр.
+            if (_role != "Manager")
             {
                 BtnAdd.Visibility = Visibility.Collapsed;
                 BtnDelete.Visibility = Visibility.Collapsed;
             }
-            else if (_role == "Manager")
-            {
-                BtnDelete.Visibility = Visibility.Collapsed;
-            }
+
             UpdateList();
         }
 
         private void UpdateList()
         {
             if (WorkListView == null) return;
+
             using (var db = new ProjectOrganizationDBEntities())
             {
                 var contractsMap = db.Contracts.ToDictionary(c => c.ContractID, c => c.ContractNumber);
@@ -77,6 +77,7 @@ namespace ProjectOrganization
 
                 if (int.TryParse(TBoxSearch.Text, out int searchId))
                     list = list.Where(x => x.ContractID == searchId).ToList();
+
                 if (CmbSort.SelectedIndex == 1) list = list.OrderByDescending(x => x.StartDate?.ToString()).ToList();
                 if (CmbSort.SelectedIndex == 2) list = list.OrderBy(x => x.ContractID).ToList();
 
@@ -94,14 +95,19 @@ namespace ProjectOrganization
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            if (_role == "Employee") return;
+            if (_role != "Manager")
+            {
+                MessageBox.Show("Добавление работ доступно только менеджеру.",
+                    "Доступ запрещён", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var win = new WorkEditWindow();
             if (win.ShowDialog() == true) UpdateList();
         }
 
         private void WorkListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (_role == "Employee" || WorkListView.SelectedItem == null) return;
+            if (_role != "Manager" || WorkListView.SelectedItem == null) return;
             var row = (WorkRowView)WorkListView.SelectedItem;
             var win = new WorkEditWindow(row.SourceWork);
             if (win.ShowDialog() == true) UpdateList();
@@ -109,31 +115,52 @@ namespace ProjectOrganization
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (_role == "Employee" || _role == "Manager") return;
-            if (WorkListView.SelectedItem == null)
+            if (_role != "Manager")
             {
-                MessageBox.Show("Выберите работу!");
+                MessageBox.Show("Удаление работ доступно только менеджеру.",
+                    "Доступ запрещён", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            if (WorkListView.SelectedItem == null)
+            {
+                MessageBox.Show("Сначала выберите работу в списке (кликните по строке).",
+                    "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var row = (WorkRowView)WorkListView.SelectedItem;
             var work = row.SourceWork;
+
+            if (MessageBox.Show($"Удалить работу №{work.WorkID}?\n\nДействие необратимо.",
+                "Подтверждение удаления",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+
             try
             {
-                if (MessageBox.Show($"Удалить работу №{work.WorkID}?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.No) return;
                 using (var db = new ProjectOrganizationDBEntities())
                 {
                     var workToDelete = db.ProjectWorks.FirstOrDefault(x => x.WorkID == work.WorkID);
-                    if (workToDelete != null)
+                    if (workToDelete == null)
                     {
-                        db.ProjectWorks.Remove(workToDelete);
-                        db.SaveChanges();
+                        MessageBox.Show("Работа не найдена в базе.",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                         UpdateList();
+                        return;
                     }
+
+                    db.ProjectWorks.Remove(workToDelete);
+                    db.SaveChanges();
                 }
+
+                MessageBox.Show("Работа удалена.", "Готово",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                UpdateList();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка: " + ex.Message);
+                MessageBox.Show("Ошибка удаления: " + (ex.InnerException?.Message ?? ex.Message),
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

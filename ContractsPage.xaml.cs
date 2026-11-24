@@ -28,17 +28,23 @@ namespace ProjectOrganization
         {
             InitializeComponent();
             _role = role;
+
+            // Добавлять могут ВСЕ (Manager + Employee)
             BtnAdd.Visibility = Visibility.Visible;
-            if (_role == "Employee" || _role == "Manager")
+
+            // Удалять — только Manager
+            if (_role != "Manager")
             {
                 BtnDelete.Visibility = Visibility.Collapsed;
             }
+
             UpdateList();
         }
 
         private void UpdateList()
         {
             if (ContractListView == null) return;
+
             using (var db = new ProjectOrganizationDBEntities())
             {
                 var orgsMap = db.Organizations.ToDictionary(o => o.OrganizationID, o => o.OrgName);
@@ -69,9 +75,12 @@ namespace ProjectOrganization
                 }).ToList();
 
                 if (!string.IsNullOrWhiteSpace(TBoxSearch.Text))
-                    list = list.Where(x => x.ContractNumber != null && x.ContractNumber.ToLower().Contains(TBoxSearch.Text.ToLower())).ToList();
+                    list = list.Where(x => x.ContractNumber != null &&
+                                           x.ContractNumber.ToLower().Contains(TBoxSearch.Text.ToLower())).ToList();
+
                 if (decimal.TryParse(TxtMinAmount.Text, out decimal minAmount))
                     list = list.Where(x => x.ContractAmount >= minAmount).ToList();
+
                 if (CmbSort.SelectedIndex == 1) list = list.OrderByDescending(x => x.ContractDate?.ToString()).ToList();
                 if (CmbSort.SelectedIndex == 2) list = list.OrderByDescending(x => x.ContractAmount).ToList();
 
@@ -90,13 +99,15 @@ namespace ProjectOrganization
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
+            // Добавлять могут все — проверка роли не нужна
             var win = new ContractEditWindow();
             if (win.ShowDialog() == true) UpdateList();
         }
 
         private void ContractListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (ContractListView.SelectedItem == null) return;
+            // Редактирование — только Manager
+            if (_role != "Manager" || ContractListView.SelectedItem == null) return;
             var row = (ContractRowView)ContractListView.SelectedItem;
             var win = new ContractEditWindow(row.SourceContract);
             if (win.ShowDialog() == true) UpdateList();
@@ -104,14 +115,27 @@ namespace ProjectOrganization
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (_role == "Employee" || _role == "Manager") return;
-            if (ContractListView.SelectedItem == null)
+            if (_role != "Manager")
             {
-                MessageBox.Show("Выберите договор!");
+                MessageBox.Show("Удаление договоров доступно только менеджеру.",
+                    "Доступ запрещён", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            if (ContractListView.SelectedItem == null)
+            {
+                MessageBox.Show("Сначала выберите договор в списке (кликните по строке).",
+                    "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var row = (ContractRowView)ContractListView.SelectedItem;
             var con = row.SourceContract;
+
+            if (MessageBox.Show($"Удалить договор №{con.ContractNumber}?\n\nДействие необратимо.",
+                "Подтверждение удаления",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+
             try
             {
                 using (var db = new ProjectOrganizationDBEntities())
@@ -119,22 +143,32 @@ namespace ProjectOrganization
                     bool hasWorks = db.ProjectWorks.Any(x => x.ContractID == con.ContractID);
                     if (hasWorks)
                     {
-                        MessageBox.Show("Невозможно удалить! По договору есть работы.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Невозможно удалить! По договору есть работы.",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
-                    if (MessageBox.Show($"Удалить договор №{con.ContractNumber}?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.No) return;
+
                     var conToDelete = db.Contracts.FirstOrDefault(x => x.ContractID == con.ContractID);
-                    if (conToDelete != null)
+                    if (conToDelete == null)
                     {
-                        db.Contracts.Remove(conToDelete);
-                        db.SaveChanges();
+                        MessageBox.Show("Договор не найден в базе.",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                         UpdateList();
+                        return;
                     }
+
+                    db.Contracts.Remove(conToDelete);
+                    db.SaveChanges();
                 }
+
+                MessageBox.Show("Договор удалён.", "Готово",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                UpdateList();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка: " + ex.Message);
+                MessageBox.Show("Ошибка удаления: " + (ex.InnerException?.Message ?? ex.Message),
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
