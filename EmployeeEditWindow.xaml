@@ -58,8 +58,6 @@
                       DisplayMemberPath="DepartmentName"
                       SelectedValuePath="DepartmentID"/>
         </StackPanel>
-
-        <!-- >>> ИЗМЕНЕНИЕ: убран лишний вложенный Grid, добавлены DataObject.Pasting <<< -->
         <Grid Grid.Row="7" Margin="0,0,0,6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>

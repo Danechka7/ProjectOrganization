@@ -28,11 +28,8 @@ namespace ProjectOrganization
         {
             InitializeComponent();
             _role = role;
-
-            // Добавлять могут ВСЕ (Manager + Employee)
             BtnAdd.Visibility = Visibility.Visible;
 
-            // Удалять — только Manager
             if (_role != "Manager")
             {
                 BtnDelete.Visibility = Visibility.Collapsed;
@@ -99,14 +96,12 @@ namespace ProjectOrganization
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
-            // Добавлять могут все — проверка роли не нужна
             var win = new ContractEditWindow();
             if (win.ShowDialog() == true) UpdateList();
         }
 
         private void ContractListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            // Редактирование — только Manager
             if (_role != "Manager" || ContractListView.SelectedItem == null) return;
             var row = (ContractRowView)ContractListView.SelectedItem;
             var win = new ContractEditWindow(row.SourceContract);

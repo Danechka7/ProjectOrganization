@@ -48,8 +48,6 @@ namespace ProjectOrganization
                         if (pos.Contains("админ")) role = "Admin";
                         else if (pos.Contains("начальник") || pos.Contains("руковод") || pos.Contains("менедж")) role = "Manager";
                     }
-
-                    // >>> ИЗМЕНЕНИЕ: передаём ФИО <<<
                     string fio = $"{emp.LastName} {emp.FirstName} {emp.Patronymic}".Trim();
                     if (string.IsNullOrWhiteSpace(fio)) fio = emp.Login;
 

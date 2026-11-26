@@ -69,7 +69,6 @@
             </Grid>
         </Border>
 
-        <!-- >>> ИЗМЕНЕНИЕ: SelectionMode="Single" + подсветка выбранной строки <<< -->
         <ListView Name="EmployeeListView" Grid.Row="3"
                   SelectionMode="Single"
                   MouseDoubleClick="EmployeeListView_MouseDoubleClick"
@@ -83,10 +82,8 @@
                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                             <Setter Property="Background" Value="#F9F9F9"/>
                         </Trigger>
-                        <!-- >>> ИЗМЕНЕНИЕ: видимая подсветка выбранной строки <<< -->
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="#BBDEFB"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="#E3F2FD"/>

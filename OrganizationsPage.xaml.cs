@@ -14,8 +14,6 @@ namespace ProjectOrganization
         {
             InitializeComponent();
             _role = role;
-
-            // Manager: полный доступ. Employee: только просмотр.
             if (_role != "Manager")
             {
                 BtnAdd.Visibility = Visibility.Collapsed;

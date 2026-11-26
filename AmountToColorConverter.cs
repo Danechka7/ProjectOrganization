@@ -10,7 +10,7 @@ namespace ProjectOrganization
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is decimal amount && amount > 2000000)
-                return new SolidColorBrush(Color.FromRgb(200, 255, 200)); // Светло-зеленый
+                return new SolidColorBrush(Color.FromRgb(200, 255, 200));
 
             return new SolidColorBrush(Colors.Transparent);
         }

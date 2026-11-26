@@ -75,8 +75,26 @@ namespace ProjectOrganization
                     };
                 }).ToList();
 
-                if (int.TryParse(TBoxSearch.Text, out int searchId))
-                    list = list.Where(x => x.ContractID == searchId).ToList();
+                string searchText = TBoxSearch.Text?.Trim() ?? "";
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    if (int.TryParse(searchText, out int searchId))
+                    {
+                        list = list.Where(x =>
+                            x.ContractID == searchId ||
+                            (x.WorkDescription != null &&
+                             x.WorkDescription.ToLower().Contains(searchText.ToLower()))
+                        ).ToList();
+                    }
+                    else
+                    {
+                        list = list.Where(x =>
+                            x.WorkDescription != null &&
+                            x.WorkDescription.ToLower().Contains(searchText.ToLower())
+                        ).ToList();
+                    }
+                }
 
                 if (CmbSort.SelectedIndex == 1) list = list.OrderByDescending(x => x.StartDate?.ToString()).ToList();
                 if (CmbSort.SelectedIndex == 2) list = list.OrderBy(x => x.ContractID).ToList();
@@ -88,10 +106,6 @@ namespace ProjectOrganization
         private void TBoxSearch_TextChanged(object sender, TextChangedEventArgs e) => UpdateList();
         private void CmbSort_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateList();
 
-        private void OnlyNumbers_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            e.Handled = !Regex.IsMatch(e.Text, "[0-9]+");
-        }
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {

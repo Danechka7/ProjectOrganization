@@ -11,7 +11,7 @@ namespace ProjectOrganization
         public MainWindow(string role, string employeeName = "")
         {
             InitializeComponent();
-            _role = NormalizeRole(role);   // >>> ИЗМЕНЕНИЕ
+            _role = NormalizeRole(role);
             _employeeName = employeeName;
 
             string displayName = !string.IsNullOrWhiteSpace(_employeeName)
@@ -31,8 +31,6 @@ namespace ProjectOrganization
                 TxtUserInfo.Foreground = Brushes.White;
             }
         }
-
-        // >>> ИЗМЕНЕНИЕ: защита от регистра <<<
         private string NormalizeRole(string role)
         {
             if (string.IsNullOrWhiteSpace(role)) return "Employee";
