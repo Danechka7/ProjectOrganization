@@ -20,7 +20,6 @@ namespace ProjectOrganization
             public string Position { get; set; }
             public int? DepartmentID { get; set; }
             public string DepartmentNameDisplay { get; set; }
-            public string Login { get; set; }
             public string Gender { get; set; }
             public int Age { get; set; }
             public string Address { get; set; }
@@ -31,12 +30,11 @@ namespace ProjectOrganization
         {
             InitializeComponent();
             _role = role;
+
             if (_role != "Manager")
             {
                 BtnAdd.Visibility = Visibility.Collapsed;
                 BtnDelete.Visibility = Visibility.Collapsed;
-                TxtLoginHeader.Visibility = Visibility.Collapsed;
-                LoginHeaderCol.Width = new GridLength(0);
             }
 
             LoadDepartments();
@@ -79,7 +77,6 @@ namespace ProjectOrganization
                         Position = emp.Position,
                         DepartmentID = deptId,
                         DepartmentNameDisplay = deptName,
-                        Login = emp.Login,
                         Gender = emp.Gender,
                         Age = emp.Age ?? 0,
                         Address = emp.Address,

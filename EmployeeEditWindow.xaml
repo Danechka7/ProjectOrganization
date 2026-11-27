@@ -83,12 +83,12 @@
                         SelectedDateChanged="DpBirthDate_SelectedDateChanged"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="9" Margin="0,0,0,6">
+        <StackPanel Grid.Row="9" Margin="0,0,0,6" x:Name="LoginPanel">
             <TextBlock Text="Логин (уникальный) *"/>
             <TextBox Name="TxtLogin" Height="25"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="10" Margin="0,0,0,10">
+        <StackPanel Grid.Row="10" Margin="0,0,0,10" x:Name="PasswordPanel">
             <TextBlock Text="Пароль *"/>
             <TextBox Name="TxtPassword" Height="25"/>
         </StackPanel>

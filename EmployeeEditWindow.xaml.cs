@@ -10,13 +10,13 @@ namespace ProjectOrganization
     public partial class EmployeeEditWindow : Window
     {
         private Employees _editingEmployee = null;
-
-        // >>> ИЗМЕНЕНИЕ: добавлены точка, запятая, дефис <<<
         private static readonly Regex AddressRegex =
             new Regex(@"^[\p{L}\p{N}\s\.,\-]+$", RegexOptions.Compiled);
 
         private static readonly Regex HouseRegex =
             new Regex(@"^[\p{L}\p{N}\s/]+$", RegexOptions.Compiled);
+        private static readonly Regex StreetHasLetterRegex =
+           new Regex(@"\p{L}", RegexOptions.Compiled);
 
         public EmployeeEditWindow()
         {
@@ -36,8 +36,9 @@ namespace ProjectOrganization
             CmbGender.Text = emp.Gender;
             CmbDepartment.SelectedValue = emp.DepartmentID;
             DpBirthDate.SelectedDate = emp.BirthDate;
-            TxtLogin.Text = emp.Login;
-            TxtPassword.Text = emp.Password;
+
+            LoginPanel.Visibility = Visibility.Collapsed;
+            PasswordPanel.Visibility = Visibility.Collapsed;
 
             if (!string.IsNullOrWhiteSpace(emp.Address))
             {
@@ -77,7 +78,6 @@ namespace ProjectOrganization
             e.Handled = !HouseRegex.IsMatch(e.Text);
         }
 
-        // >>> ИЗМЕНЕНИЕ: защита от вставки из буфера <<<
         private void Address_Pasting(object sender, DataObjectPastingEventArgs e)
         {
             if (e.DataObject.GetDataPresent(typeof(string)))
@@ -113,28 +113,40 @@ namespace ProjectOrganization
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            string login = TxtLogin.Text.Trim();
-            string password = TxtPassword.Text.Trim();
             string street = TxtStreet.Text.Trim();
             string house = TxtHouse.Text.Trim();
-
             if (string.IsNullOrWhiteSpace(TxtLastName.Text) ||
                 string.IsNullOrWhiteSpace(TxtFirstName.Text) ||
                 string.IsNullOrWhiteSpace(CmbPosition.Text) ||
                 string.IsNullOrWhiteSpace(CmbGender.Text) ||
                 string.IsNullOrWhiteSpace(street) ||
                 string.IsNullOrWhiteSpace(house) ||
-                DpBirthDate.SelectedDate == null ||
-                string.IsNullOrEmpty(login) ||
-                string.IsNullOrEmpty(password))
+                DpBirthDate.SelectedDate == null)
             {
-                MessageBox.Show("Заполните все обязательные поля (включая адрес, дом, логин и пароль)!");
+                MessageBox.Show("Заполните все обязательные поля (включая адрес и дом)!");
                 return;
+            }
+            string login = TxtLogin.Text.Trim();
+            string password = TxtPassword.Text.Trim();
+
+            if (_editingEmployee == null)
+            {
+                if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
+                {
+                    MessageBox.Show("Для нового сотрудника обязательно задать логин и пароль!");
+                    return;
+                }
             }
 
             if (!AddressRegex.IsMatch(street))
             {
                 MessageBox.Show("В поле «Улица» допускаются только буквы, цифры, пробел, точка, запятая и дефис!");
+                TxtStreet.Focus();
+                return;
+            }
+            if (!StreetHasLetterRegex.IsMatch(street))
+            {
+                MessageBox.Show("Название улицы должно содержать хотя бы одну букву (не может состоять только из цифр)!");
                 TxtStreet.Focus();
                 return;
             }
@@ -152,20 +164,16 @@ namespace ProjectOrganization
             {
                 using (var db = new ProjectOrganizationDBEntities())
                 {
-                    int? editingId = _editingEmployee?.EmployeeID;
-                    bool loginExists = db.Employees.Any(x =>
-                        x.Login != null &&
-                        x.Login.ToLower() == login.ToLower() &&
-                        (!editingId.HasValue || x.EmployeeID != editingId.Value));
-
-                    if (loginExists)
-                    {
-                        MessageBox.Show("Такой логин уже используется другим сотрудником! Введите уникальный логин.");
-                        return;
-                    }
-
                     if (_editingEmployee == null)
                     {
+                        bool loginExists = db.Employees.Any(x =>
+                            x.Login != null && x.Login.ToLower() == login.ToLower());
+                        if (loginExists)
+                        {
+                            MessageBox.Show("Такой логин уже используется! Введите уникальный.");
+                            return;
+                        }
+
                         db.Employees.Add(new Employees
                         {
                             LastName = TxtLastName.Text.Trim(),
@@ -193,8 +201,6 @@ namespace ProjectOrganization
                             emp.BirthDate = DpBirthDate.SelectedDate.Value;
                             emp.DepartmentID = CmbDepartment.SelectedValue as int?;
                             emp.Address = fullAddress;
-                            emp.Login = login;
-                            emp.Password = password;
                         }
                     }
 
