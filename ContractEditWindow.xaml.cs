@@ -17,7 +17,11 @@ namespace ProjectOrganization
         {
             InitializeComponent();
             TxtTitle.Text = "Добавление договора";
+
+            // >>> ДАТА ВСЕГДА СЕГОДНЯШНЯЯ И НЕ МЕНЯЕТСЯ <<<
             DpContractDate.SelectedDate = DateTime.Today;
+            DpContractDate.IsEnabled = false;
+
             LoadData();
             GenerateContractNumber();
 
@@ -37,7 +41,9 @@ namespace ProjectOrganization
             TxtAmount.Text = con.ContractAmount.ToString();
             CmbOrganization.SelectedValue = con.OrganizationID;
             CmbEmployee.SelectedValue = con.ResponsibleEmployeeID;
-            if (con.ContractDate != null) DpContractDate.SelectedDate = con.ContractDate;
+
+            if (con.ContractDate != null)
+                DpContractDate.SelectedDate = con.ContractDate;
         }
 
         private void GenerateContractNumber()
@@ -111,34 +117,17 @@ namespace ProjectOrganization
                 ? AuthWindow.CurrentEmployee.EmployeeID
                 : (CmbEmployee.SelectedValue as int?);
 
+            // Убрали проверку даты из условий, так как она всегда сегодняшняя
             if (string.IsNullOrWhiteSpace(TxtNumber.Text) ||
                 string.IsNullOrWhiteSpace(TxtAmount.Text) ||
                 CmbOrganization.SelectedItem == null ||
-                responsibleEmployeeId == null ||
-                DpContractDate.SelectedDate == null)
+                responsibleEmployeeId == null)
             {
-                MessageBox.Show("Заполните все обязательные поля!");
+                MessageBox.Show("Заполните все обязательные поля (кроме даты)!");
                 return;
             }
 
-            DateTime selectedDate = DpContractDate.SelectedDate.Value.Date;
-            if (_editingContract == null)
-            {
-                if (selectedDate != DateTime.Today)
-                {
-                    MessageBox.Show("Для нового договора дата должна быть сегодняшней!");
-                    return;
-                }
-            }
-            else if (_editingContract.ContractDate != null)
-            {
-                int daysPassed = (DateTime.Today - _editingContract.ContractDate.Date).Days;
-                if (daysPassed > 7 && selectedDate != _editingContract.ContractDate.Date)
-                {
-                    MessageBox.Show("Договор создан более 7 дней назад. Менять дату запрещено!");
-                    return;
-                }
-            }
+            DateTime selectedDate = DateTime.Today; // Всегда сегодня
 
             try
             {
@@ -166,33 +155,77 @@ namespace ProjectOrganization
                     }
 
                     decimal amount = decimal.Parse(TxtAmount.Text.Replace('.', ','));
+
                     if (_editingContract == null)
                     {
-                        db.Contracts.Add(new Contracts
+                        var newContract = new Contracts
                         {
                             ContractNumber = TxtNumber.Text,
                             ContractDate = selectedDate,
                             ContractAmount = amount,
                             OrganizationID = orgForContract.OrganizationID,
                             ResponsibleEmployeeID = responsibleEmployeeId.Value
-                        });
+                        };
+                        db.Contracts.Add(newContract);
+                        db.SaveChanges(); // Сохраняем, чтобы получить ID
+
+                        // >>> ЦИКЛ ДОБАВЛЕНИЯ РАБОТ <<<
+                        bool addMore = true;
+                        while (addMore)
+                        {
+                            // Открываем окно работы, передавая ему ID только что созданного договора
+                            var workWindow = new WorkEditWindow(newContract.ContractID);
+
+                            if (workWindow.ShowDialog() == true)
+                            {
+                                // Работа создана, спрашиваем, добавить ли еще одну
+                                var result = MessageBox.Show("Работа успешно добавлена! Хотите добавить еще одну работу по этому договору?",
+                                    "Добавление работ", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                                if (result == MessageBoxResult.No)
+                                {
+                                    addMore = false; // Выходим из цикла
+                                }
+                            }
+                            else
+                            {
+                                // Если пользователь закрыл/отменил первую работу — удаляем договор (откат)
+                                if (!db.ProjectWorks.Any(w => w.ContractID == newContract.ContractID))
+                                {
+                                    db.Contracts.Remove(newContract);
+                                    db.SaveChanges();
+                                    MessageBox.Show("Договор не сохранён, так как по нему не было создано ни одной работы.",
+                                        "Отмена", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                    return;
+                                }
+                                else
+                                {
+                                    // Если хотя бы одна работа уже есть, просто выходим
+                                    addMore = false;
+                                }
+                            }
+                        }
+
+                        DialogResult = true;
+                        this.Close();
                     }
                     else
                     {
+                        // Редактирование договора (без создания работ)
                         var con = db.Contracts.FirstOrDefault(x => x.ContractID == _editingContract.ContractID);
                         if (con != null)
                         {
                             con.ContractNumber = TxtNumber.Text;
-                            con.ContractDate = selectedDate;
                             con.ContractAmount = amount;
                             con.OrganizationID = orgForContract.OrganizationID;
                             con.ResponsibleEmployeeID = responsibleEmployeeId.Value;
+                            // Дату не трогаем, она остается старой
+
+                            db.SaveChanges();
+                            DialogResult = true;
+                            this.Close();
                         }
                     }
-
-                    db.SaveChanges();
-                    DialogResult = true;
-                    this.Close();
                 }
             }
             catch (Exception ex)
